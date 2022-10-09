@@ -6,6 +6,7 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 public class ServerUtil {
     /**
@@ -15,7 +16,7 @@ public class ServerUtil {
      * @return a new Javalin server with the {@code Server} header enabled.
      */
     public static Server createServer() {
-        Server server = new Server(ConcurrencyUtil.INSTANCE.jettyThreadPool("JettyServerThreadPool"));
+        Server server = new Server(new QueuedThreadPool(250, 8, 60_000));
         ServerConnector connector;
 
         //The http configuration object

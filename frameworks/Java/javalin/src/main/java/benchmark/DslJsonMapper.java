@@ -25,6 +25,7 @@ public class DslJsonMapper {
         try {
             context.contentType(ContentType.APPLICATION_JSON);
             dslJson.serialize(obj, context.res().getOutputStream());
+            context.res().getOutputStream().flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

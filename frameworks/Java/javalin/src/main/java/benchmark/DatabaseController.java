@@ -22,23 +22,28 @@ public class DatabaseController {
     }
 
     public void handleSingleDbQuery(Context ctx) {
-        jsonMapper.writeJson(dbService.getWorld(1).get(0), ctx);
+        ctx.future(()-> dbService.getWorldAsync(1)
+                .thenAccept(worlds -> jsonMapper.writeJson(worlds.get(0), ctx)));
     }
 
     public void handleMultipleDbQueries(Context ctx) {
         int num = getBoundedRowNumber(ctx.queryParam("queries"));
-        jsonMapper.writeJson(dbService.getWorld(num), ctx);
+        ctx.future(()-> dbService.getWorldAsync(num)
+                .thenAccept(worlds -> jsonMapper.writeJson(worlds, ctx)));
     }
 
     public void handleFortunes(Context ctx) {
-        List<Fortune> fortuneList = dbService.getFortune();
-        Map<String, List<Fortune>> map = Collections.singletonMap("list", fortuneList);
-        ctx.render("fortune.jte", map).header("Content-Type", "text/html; charset=utf-8");
+        ctx.future(()-> dbService.getFortuneAsync()
+                .thenAccept(fortuneList -> {
+                    Map<String, List<Fortune>> map = Collections.singletonMap("list", fortuneList);
+                    ctx.render("fortune.jte", map).header("Content-Type", "text/html; charset=utf-8");
+                }));
     }
 
     public void handleUpdates(Context ctx) {
         int num = getBoundedRowNumber(ctx.queryParam("queries"));
-        jsonMapper.writeJson(dbService.updateWorld(num), ctx);
+        ctx.future(()-> dbService.updateWorldAsync(num)
+                .thenAccept(worlds -> jsonMapper.writeJson(worlds, ctx)));
     }
 
     private static int getBoundedRowNumber(String number) {
